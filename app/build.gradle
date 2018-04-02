@@ -1,13 +1,50 @@
 apply plugin: 'com.android.application'
+//发布时间
+def releaseTime() {
+
+    Calendar calendar = Calendar.getInstance()
+    String year = calendar.get(Calendar.YEAR)
+    String month = calendar.get(Calendar.MONTH) + 1
+    String day = calendar.get(Calendar.DAY_OF_MONTH)
+    String hour = calendar.get(Calendar.HOUR_OF_DAY)
+    String minute = calendar.get(Calendar.MINUTE)
+    String second = calendar.get(Calendar.SECOND)
+
+
+    StringBuffer sb = new StringBuffer()
+    sb.append(year)
+    sb.append("年")
+    sb.append(month)
+    sb.append("月")
+    sb.append(day)
+    sb.append("日")
+    sb.append(hour)
+    sb.append("时")
+    sb.append(minute)
+    sb.append("分")
+    sb.append(second)
+    sb.append("秒")
+
+    return sb.toString();
+}
+//版本名称
+def VERSION_NAME = "1.0"
+//版本号
+def VERSION_CODE = 1
+
+//ApplicationName
+def appName() {
+    return "应用名称"
+}
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "com.xkrossia.work.android.architecture"
-        minSdkVersion 19
-        targetSdkVersion 26
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode VERSION_CODE
+        versionName VERSION_NAME
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -15,12 +52,25 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            minifyEnabled false
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            if (outputFileName.endsWith('release.apk')) {
+                outputFileName = appName() + "_${defaultConfig.versionCode}_${defaultConfig.versionName}" + "_" + releaseTime() + "_release.apk"
+            } else if (outputFileName.endsWith('debug.apk')) {
+                outputFileName = appName() + "_${defaultConfig.versionCode}_${defaultConfig.versionName}" + "_" + releaseTime() + "_debug.apk"
+            }
+        }
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
